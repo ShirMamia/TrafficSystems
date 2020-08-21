@@ -1,0 +1,10 @@
+﻿  Car.cpp
+  CarsManagment.cpp
+  Cell.cpp
+  TrafficSystem.cpp
+  main.cpp
+  Generating Code...
+C:\Users\shir2\source\repos\TrafficSystemsPart3\TrafficSystemsPart3\TrafficSystem.cpp(21): warning C4715: 'TrafficSystem::getTextForEnumGuiValues': not all control paths return a value
+C:\Users\shir2\source\repos\TrafficSystemsPart3\TrafficSystemsPart3\TrafficSystem.cpp(164): warning C4715: 'TrafficSystem::getColorFromEnum': not all control paths return a value
+C:\Users\shir2\source\repos\TrafficSystemsPart3\TrafficSystemsPart3\Car.cpp(21): warning C4715: 'Car::getCharFromEnum': not all control paths return a value
+  TrafficSystemsPart3.vcxproj -> C:\Users\shir2\source\repos\TrafficSystemsPart3\Debug\TrafficSystemsPart3.exe
