@@ -133,6 +133,7 @@ TrafficSystem::TrafficSystem(const string& fileName) {
     populateMatrices();
 
     CarsManagment::CarsManagment(_matrix,_matrix_rows,_matrix_cols);
+    cout << "car managment finished!"<< endl;
 }
 TrafficSystem::~TrafficSystem() {
     //free _matrix
