@@ -35,3 +35,7 @@ ben guryon
 nordou
 200
 0
+2 0
+rupin
+200
+0

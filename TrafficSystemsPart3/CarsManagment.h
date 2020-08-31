@@ -8,7 +8,7 @@ using namespace std;
 class CarsManagment
 {
 public:
-	CarsManagment(Cell** matrix, int rows, int cols);
+	CarsManagment(Cell** &matrix, int rows, int cols);
 	//moveCar
 
 private:

@@ -1,7 +1,7 @@
 #include "CarsManagment.h"
 
 int CarsManagment::_numOfCars = 0;
-CarsManagment::CarsManagment(Cell** matrix, int rows,int cols)
+CarsManagment::CarsManagment(Cell** &matrix, int rows,int cols)
 {
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
@@ -16,14 +16,14 @@ CarsManagment::CarsManagment(Cell** matrix, int rows,int cols)
 				int y = matrix[i][j].getHorizontalSt()->getY();
 				int location = matrix[i][j].getHorizontalCellNumber();
 
-				matrix[i][j].setHorizontalCar(&Car(x,y, location));
+				matrix[i][j].setHorizontalCar( new Car(x,y, location));
 
 			}
 			else if (isFirstCellVertical && !cellhasCarVertical && !isJunction) {
 				int x = matrix[i][j].getVerticalSt()->getX();
 				int y = matrix[i][j].getVerticalSt()->getY();
 				int location = matrix[i][j].getVerticalCellNumber();
-				matrix[i][j].setVerticalCar(&Car(x,y, location));
+				matrix[i][j].setVerticalCar( new Car(x,y, location));
 			}
 		}
 	}

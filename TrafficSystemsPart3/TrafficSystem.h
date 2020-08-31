@@ -49,11 +49,13 @@ private:
 	void setGuiVector(int i, int j, int id, Street::eDirection direction);
 	int getColorNumber(const string& idString) const;
 
+	//cars
+	void addCarToTheBegginingOfEachStreet();
 
 	//print methods
 	void printCell(int i, int j, bool isFirst = false) const;
-	void printCellAtFirst(bool hasColor, int color, int i, int j) const;
-	void printCellAtMiddle(bool hasColor, int color,bool isRed, bool hasCar, int i, int j) const;
+	void printCellAtFirst(bool hasColor, int color, int i, int j, char token) const; // not in use
+	void executePrintCell(bool isFirst,bool hasColor, int color,bool isRed, int i, int j ,char token) const;
 
 public:
 	TrafficSystem(const string& fileName);

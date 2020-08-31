@@ -132,21 +132,64 @@ TrafficSystem::TrafficSystem(const string& fileName) {
 
     populateMatrices();
 
-    CarsManagment::CarsManagment(_matrix,_matrix_rows,_matrix_cols);
-    cout << "car managment finished!"<< endl;
+    addCarToTheBegginingOfEachStreet();
+
+    cout << "car m finished!"<< endl;
 }
 TrafficSystem::~TrafficSystem() {
-    //free _matrix
+/*
+    for (int i = 0; i < _matrix_rows; i++) {
+        for (int j = 0; j < _matrix_rows; j++) {
+            if(_matrix[i][j].getHorizontalCar() != nullptr) {
+                delete[] _matrix[i][j].getHorizontalCar();
+            }
+            if (_matrix[i][j].getVerticalSt() != nullptr) {
+                delete[] _matrix[i][j].getVerticalSt();
+            }
+        }
+    }
+    */
+        //free _matrix
     for (int i = 0; i < _matrix_rows; i++) {
         delete[] _matrix[i];
     }
     delete[] _matrix;
+
 }
 int TrafficSystem::getColorNumber(const string& idString) const
 {
     int id = Street::getEnumFromLetter(idString);
     int color = id % NUMBER_OF_COLORS;
     return getColorFromEnum(static_cast<eColorValues>(color));
+}
+
+void TrafficSystem::addCarToTheBegginingOfEachStreet()
+{
+    for (int i = 0; i < _matrix_rows; i++) {
+        for (int j = 0; j < _matrix_cols; j++) {
+            bool isFirstCellHorizontal = (_matrix[i][j].getHorizontalSt() != nullptr) && (_matrix[i][j].getHorizontalCellNumber() == 0);
+            bool cellhasCarHorizontal = _matrix[i][j].getHorizontalCar() != nullptr;
+            bool isFirstCellVertical = (_matrix[i][j].getVerticalSt() != nullptr) && (_matrix[i][j].getVerticalCellNumber() == 0);
+            bool cellhasCarVertical = _matrix[i][j].getVerticalCar() != nullptr;
+            bool isJunction = _matrix[i][j].getIsJunction();
+
+            if (isFirstCellHorizontal && !cellhasCarHorizontal && !isJunction) {
+                int x = _matrix[i][j].getHorizontalSt()->getX();
+                int y = _matrix[i][j].getHorizontalSt()->getY();
+                int location = _matrix[i][j].getHorizontalCellNumber();
+
+                _matrix[i][j].setHorizontalCar(new Car(x, y, location));
+
+            }
+            else if (isFirstCellVertical && !cellhasCarVertical && !isJunction) {
+                int x = _matrix[i][j].getVerticalSt()->getX();
+                int y = _matrix[i][j].getVerticalSt()->getY();
+                int location = _matrix[i][j].getVerticalCellNumber();
+                _matrix[i][j].setVerticalCar(new Car(x, y, location));
+            }
+        }
+    }
+
 }
 
 void TrafficSystem::drawColor(int backgroundColor, char token) const {
@@ -156,7 +199,7 @@ void TrafficSystem::drawColor(int backgroundColor, char token) const {
 }
 int TrafficSystem::getColorFromEnum(eColorValues color) const{
     static std::map<eColorValues, int> EnumColorToIntValue{
-       {LIGHT_BLUE, 50} , {BLUE,150} , {YELLOW,225} , {GREEN,170} , {WHITE,250} , {DARK_PINK,210} , {GRAY,130}
+       {LIGHT_BLUE, 50} , {BLUE,150} , {YELLOW,225} , {GREEN,175} , {WHITE,250} , {DARK_PINK,210} , {GRAY,130}
     };
     auto x = EnumColorToIntValue.find(color);
     if (x != std::end(EnumColorToIntValue)) {
@@ -171,23 +214,31 @@ void TrafficSystem::printCell(int i, int j, bool isFirst) const
     bool isRed = _gui_vector[i][j] == getTextForEnumGuiValues(eGuiValues::RED_LIGHT);
     bool hasColor = !isJunctionOrEmptyCell && !isSpaceBetweenCells;
     bool areEven = (i % 2 == 0) && (j % 2 == 0);
-    bool hasHorizontalCar = _matrix[i/2][j/2].getHorizontalCar()!= nullptr;
-    bool hasVerticalCar = _matrix[i/2][j/2].getVerticalCar() != nullptr;
-    bool hasCar = areEven && (hasHorizontalCar || hasVerticalCar);
+    char token = ' ';
+
+    if (areEven) {
+        Car* horizontalCar = _matrix[i / 2][j / 2].getHorizontalCar();
+        Car* verticalCar = _matrix[i / 2][j / 2].getVerticalCar();
+
+        if (horizontalCar) {
+            token = horizontalCar->getCharFromEnum();
+        }
+        else if (verticalCar) {
+
+            token = verticalCar->getCharFromEnum();
+        }
+
+    }
     if (isRed) {
         color = _trafficLightColor;
     }
     else if (hasColor) { //has color which is not red
         color = getColorNumber(_gui_vector[i][j]);
     }
-    if (isFirst) {
-        printCellAtFirst(hasColor, color, i , j);
-    }
-    else {
-        printCellAtMiddle(hasColor, color, isRed, hasCar, i , j);
-    }
+
+    executePrintCell(isFirst,hasColor, color, isRed, i , j,token);
 }
-void TrafficSystem::printCellAtFirst(bool hasColor, int color, int i, int j) const
+void TrafficSystem::printCellAtFirst(bool hasColor, int color, int i, int j, char token) const
 {
     char spaceToken = ' ';
     if (hasColor) {
@@ -200,45 +251,46 @@ void TrafficSystem::printCellAtFirst(bool hasColor, int color, int i, int j) con
     }
 }
 
-void TrafficSystem::printCellAtMiddle(bool hasColor, int color, bool isRed, bool hasCar, int i, int j) const
+void TrafficSystem::executePrintCell(bool isFirst, bool hasColor, int color, bool isRed,  int i, int j, char token) const
 {
-    char token = ' ';
     char spaceToken = ' ';
-    
-    if (hasCar) {
-        bool hasHorizontalCar = _matrix[i / 2][j / 2].getHorizontalCar() != nullptr;
-        bool hasVerticalCar = _matrix[i / 2][j / 2].getVerticalCar() != nullptr;
-        if (hasHorizontalCar) {
-            Car* horizontalCar = _matrix[i / 2][j / 2].getHorizontalCar();
-            token = horizontalCar->getCharFromEnum();
-        }
-        else if (hasVerticalCar) {
-           // token = _matrix[i / 2][j / 2].getVerticalCar()->getCharFromEnum(_matrix[i / 2][j / 2].getVerticalCar()->getCarName());
-        }
-
-    }
     if (hasColor) {
-        if (_matrix[i / 2][j / 2].getVerticalSt() != nullptr) { // is vertical
-            std::cout << " ";
-            drawColor(color, spaceToken);
-            drawColor(color, spaceToken);
+        if (isFirst) {
+            std::cout << " " << "|" << " ";
         }
-        else {
+        if (_matrix[i / 2][j / 2].getVerticalSt()) { // is vertical
+            drawColor(color, spaceToken);
+            drawColor(color, token);
+            if (!isFirst) {
+                drawColor(color, spaceToken);
+            }
+        }
+        else { // is horizontal
             if (isRed) {
-                std::cout << " ";
+                if (!isFirst) {
+                    std::cout << " ";
+                }
                 drawColor(color, spaceToken);
                 drawColor(color, spaceToken);
 
             }
             else {
                 drawColor(color, token);
-                drawColor(color, spaceToken);
+                if (!isFirst) {
+                    drawColor(color, spaceToken);
+                }
                 drawColor(color, spaceToken);
             }
         }
     }
     else {
-        std::cout << " " << _gui_vector[i][j] << " ";
+        if (isFirst) {
+            std::cout << " " << "|" << " " << _gui_vector[i][j] << " ";
+        }
+        else {
+
+            std::cout << " " << _gui_vector[i][j] << " ";
+        }
 
     }
 }
